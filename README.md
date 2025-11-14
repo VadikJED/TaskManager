@@ -156,3 +156,12 @@ TaskManager.Tests/
 └── 📁 Helpers/
     
   └── 📄 TestDbContextFactory.cs
+
+<img width="597" height="409" alt="image" src="https://github.com/user-attachments/assets/8a31eca3-7ad2-4808-840f-b368feb300b1" />
+<img width="1007" height="709" alt="image" src="https://github.com/user-attachments/assets/38a8697b-2261-48a4-9dd4-473d7f10ce1b" />
+
+# Опубликовать для Ubuntu 20.04 x64
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/linux
+
+# Или для Ubuntu 22.04 x64
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish/linux
