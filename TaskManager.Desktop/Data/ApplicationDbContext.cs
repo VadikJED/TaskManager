@@ -7,26 +7,30 @@ public class ApplicationDbContext : DbContext
 {
   public DbSet<TaskItem> Tasks { get; set; }
 
+  // Основной конструктор для Dependency Injection
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : base(options)
   {
   }
 
+  // Конструктор без параметров для тестов и миграций
+  public ApplicationDbContext()
+  {
+  }
+
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
+    // Этот метод будет использоваться только если контекст не сконфигурирован через DI
     if (!optionsBuilder.IsConfigured)
     {
-      // Для миграций и DesignTime
+      // Для миграций используем PostgreSQL
       optionsBuilder.UseNpgsql("Host=localhost;Database=taskmanager;Username=postgres;Password=1");
     }
   }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
-    // Применяем все конфигурации из сборки
-    modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
+    modelBuilder.ApplyConfiguration(new TaskItemConfiguration());
     base.OnModelCreating(modelBuilder);
   }
 }
-

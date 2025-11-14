@@ -1,11 +1,13 @@
 ﻿using Avalonia;
-using System;
-using TaskManager.Desktop.Data;
-using TaskManager.Desktop.Repositories;
-using TaskManager.Desktop.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using TaskManager.Desktop.Data;
+using TaskManager.Desktop.Repositories;
+using TaskManager.Desktop.Services;
 using TaskManager.Desktop.ViewModels;
 using TaskManager.Desktop.Views;
 
@@ -13,51 +15,74 @@ namespace TaskManager.Desktop;
 
 class Program
 {
+  private static ServiceProvider? _serviceProvider;
+
   [STAThread]
   public static void Main(string[] args)
   {
     try
     {
-      // Создаем сервисы
-      var services = ConfigureServices();
+      // Создаем и настраиваем хост приложения
+      _serviceProvider = ConfigureServices();
 
       // Инициализируем базу данных
-      DatabaseService.InitializeDatabase(services);
+      DatabaseService.InitializeDatabase(_serviceProvider);
 
       // Запускаем Avalonia
       BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
     catch (Exception ex)
     {
-      Console.WriteLine($"Application startup failed: {ex}");
+      Console.WriteLine($"❌ Application startup failed: {ex}");
       throw;
     }
   }
 
   public static AppBuilder BuildAvaloniaApp()
-    => AppBuilder.Configure<App>()
-      .UsePlatformDetect()
-      .WithInterFont()
-      .LogToTrace();
+      => AppBuilder.Configure<App>()
+          .UsePlatformDetect()
+          .WithInterFont()
+          .LogToTrace();
 
-  public static ServiceProvider ConfigureServices()
+  private static ServiceProvider ConfigureServices()
   {
+    // Build configuration
     var configuration = new ConfigurationBuilder()
-      .AddJsonFile("appsettings.json")
-      .Build();
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .Build();
 
     var services = new ServiceCollection();
 
-    // Регистрируем DbContext
-    services.AddDbContext<ApplicationDbContext>(options =>
-      options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+    // Add Logging
+    services.AddLogging(builder =>
+    {
+      builder.AddConfiguration(configuration.GetSection("Logging"));
+      builder.AddConsole();
+      builder.AddDebug();
+      builder.SetMinimumLevel(LogLevel.Information);
+    });
 
-    // Регистрируем репозиторий
+    // Register DbContext
+    services.AddDbContext<ApplicationDbContext>(options =>
+    {
+      options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+
+      // Enable sensitive data logging only in development
+#if DEBUG
+      options.EnableSensitiveDataLogging();
+#endif
+    });
+
+    // Register repositories
     services.AddScoped<ITaskRepository, TaskRepository>();
 
-    // Регистрируем ViewModels
+    // Register ViewModels
     services.AddTransient<MainWindowViewModel>();
 
     return services.BuildServiceProvider();
   }
+
+  // Публичное свойство для доступа к ServiceProvider
+  public static ServiceProvider? Services => _serviceProvider;
 }
