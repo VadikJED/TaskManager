@@ -18,7 +18,7 @@ using TaskManager.Desktop.Views;
 
 namespace TaskManager.Desktop;
 
-public partial class App : Application
+public class App : Application
 {
   public override void Initialize()
   {
@@ -34,10 +34,7 @@ public partial class App : Application
     {
       // Получаем сервис-провайдер через публичное свойство
       var services = Program.Services;
-      if (services == null)
-      {
-        throw new InvalidOperationException("ServiceProvider is not initialized");
-      }
+      if (services == null) throw new InvalidOperationException("ServiceProvider is not initialized");
 
       // Log application start
       var logger = services.GetRequiredService<ILogger<App>>();
@@ -57,9 +54,6 @@ public partial class App : Application
   private static void DisableAvaloniaDataAnnotationValidation()
   {
     var dataValidationPluginsToRemove = BindingPlugins.DataValidators.ToList();
-    foreach (var plugin in dataValidationPluginsToRemove)
-    {
-      BindingPlugins.DataValidators.Remove(plugin);
-    }
+    foreach (var plugin in dataValidationPluginsToRemove) BindingPlugins.DataValidators.Remove(plugin);
   }
 }

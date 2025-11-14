@@ -29,8 +29,8 @@ public class TaskRepository : ITaskRepository
     try
     {
       var tasks = await _context.Tasks
-          .OrderByDescending(t => t.CreatedAt)
-          .ToListAsync();
+        .OrderByDescending(t => t.CreatedAt)
+        .ToListAsync();
 
       _logger.LogInformation("Retrieved {Count} tasks from database", tasks.Count);
       return tasks;
@@ -51,13 +51,9 @@ public class TaskRepository : ITaskRepository
       var task = await _context.Tasks.FindAsync(id);
 
       if (task == null)
-      {
         _logger.LogWarning("Task with ID {TaskId} not found", id);
-      }
       else
-      {
         _logger.LogDebug("Task found: {TaskTitle}", task.Title);
-      }
 
       return task;
     }
@@ -142,9 +138,9 @@ public class TaskRepository : ITaskRepository
     try
     {
       var tasks = await _context.Tasks
-          .Where(t => t.IsCompleted)
-          .OrderByDescending(t => t.CreatedAt)
-          .ToListAsync();
+        .Where(t => t.IsCompleted)
+        .OrderByDescending(t => t.CreatedAt)
+        .ToListAsync();
 
       _logger.LogDebug("Retrieved {Count} completed tasks", tasks.Count);
       return tasks;
@@ -163,9 +159,9 @@ public class TaskRepository : ITaskRepository
     try
     {
       var tasks = await _context.Tasks
-          .Where(t => !t.IsCompleted)
-          .OrderByDescending(t => t.CreatedAt)
-          .ToListAsync();
+        .Where(t => !t.IsCompleted)
+        .OrderByDescending(t => t.CreatedAt)
+        .ToListAsync();
 
       _logger.LogDebug("Retrieved {Count} pending tasks", tasks.Count);
       return tasks;

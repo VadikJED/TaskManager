@@ -3,21 +3,20 @@ using System;
 using TaskManager.Desktop.Models;
 
 namespace TaskManager.Desktop.ViewModels;
+
 public partial class TaskItemViewModel : ObservableObject
 {
-  [ObservableProperty]
-  private Guid _id;
+  [ObservableProperty] private DateTime _createdAt;
 
-  [ObservableProperty]
-  private string _title = string.Empty;
+  [ObservableProperty] private Guid _id;
 
-  [ObservableProperty]
-  private bool _isCompleted;
+  [ObservableProperty] private bool _isCompleted;
 
-  [ObservableProperty]
-  private DateTime _createdAt;
+  [ObservableProperty] private string _title = string.Empty;
 
-  public TaskItemViewModel() { }
+  public TaskItemViewModel()
+  {
+  }
 
   public TaskItemViewModel(TaskItem task)
   {

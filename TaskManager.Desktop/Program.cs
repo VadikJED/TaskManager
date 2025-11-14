@@ -13,9 +13,10 @@ using TaskManager.Desktop.Views;
 
 namespace TaskManager.Desktop;
 
-class Program
+internal class Program
 {
-  private static ServiceProvider? _serviceProvider;
+  // Публичное свойство для доступа к ServiceProvider
+  public static ServiceProvider? Services { get; private set; }
 
   [STAThread]
   public static void Main(string[] args)
@@ -23,10 +24,10 @@ class Program
     try
     {
       // Создаем и настраиваем хост приложения
-      _serviceProvider = ConfigureServices();
+      Services = ConfigureServices();
 
       // Инициализируем базу данных
-      DatabaseService.InitializeDatabase(_serviceProvider);
+      DatabaseService.InitializeDatabase(Services);
 
       // Запускаем Avalonia
       BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
@@ -39,18 +40,20 @@ class Program
   }
 
   public static AppBuilder BuildAvaloniaApp()
-      => AppBuilder.Configure<App>()
-          .UsePlatformDetect()
-          .WithInterFont()
-          .LogToTrace();
+  {
+    return AppBuilder.Configure<App>()
+      .UsePlatformDetect()
+      .WithInterFont()
+      .LogToTrace();
+  }
 
   private static ServiceProvider ConfigureServices()
   {
     // Build configuration
     var configuration = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .Build();
+      .SetBasePath(Directory.GetCurrentDirectory())
+      .AddJsonFile("appsettings.json", false, true)
+      .Build();
 
     var services = new ServiceCollection();
 
@@ -82,7 +85,4 @@ class Program
 
     return services.BuildServiceProvider();
   }
-
-  // Публичное свойство для доступа к ServiceProvider
-  public static ServiceProvider? Services => _serviceProvider;
 }

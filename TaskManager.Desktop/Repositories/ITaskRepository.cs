@@ -5,7 +5,6 @@ using TaskManager.Desktop.Models;
 
 namespace TaskManager.Desktop.Repositories;
 
-
 public interface ITaskRepository
 {
   Task<List<TaskItem>> GetAllAsync();

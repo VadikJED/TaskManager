@@ -4,7 +4,6 @@ using TaskManager.Desktop.Models;
 
 namespace TaskManager.Desktop.Data.Configurations;
 
-
 public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
   public void Configure(EntityTypeBuilder<TaskItem> builder)

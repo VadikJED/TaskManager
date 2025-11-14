@@ -111,7 +111,7 @@ public class DatabaseService
     try
     {
       var result = context.Database.SqlQueryRaw<int>(
-          $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{tableName.ToLower()}'");
+        $"SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '{tableName.ToLower()}'");
       return result.First() > 0;
     }
     catch
@@ -126,22 +126,25 @@ public class DatabaseService
     {
       var sampleTasks = new[]
       {
-                new TaskItem {
-                    Title = "Learn Avalonia UI",
-                    IsCompleted = true,
-                    CreatedAt = DateTime.UtcNow.AddDays(-2)
-                },
-                new TaskItem {
-                    Title = "Setup Entity Framework Core",
-                    IsCompleted = true,
-                    CreatedAt = DateTime.UtcNow.AddDays(-1)
-                },
-                new TaskItem {
-                    Title = "Create Task Manager Application",
-                    IsCompleted = false,
-                    CreatedAt = DateTime.UtcNow.AddHours(-5)
-                }
-            };
+        new TaskItem
+        {
+          Title = "Learn Avalonia UI",
+          IsCompleted = true,
+          CreatedAt = DateTime.UtcNow.AddDays(-2)
+        },
+        new TaskItem
+        {
+          Title = "Setup Entity Framework Core",
+          IsCompleted = true,
+          CreatedAt = DateTime.UtcNow.AddDays(-1)
+        },
+        new TaskItem
+        {
+          Title = "Create Task Manager Application",
+          IsCompleted = false,
+          CreatedAt = DateTime.UtcNow.AddHours(-5)
+        }
+      };
 
       context.Tasks.AddRange(sampleTasks);
       context.SaveChanges();

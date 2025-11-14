@@ -10,14 +10,14 @@ namespace TaskManager.Tests.Repositories;
 public class TaskRepositoryTests : IDisposable
 {
   private readonly ApplicationDbContext _context;
-  private readonly TaskRepository _repository;
   private readonly Mock<ILogger<TaskRepository>> _mockLogger;
+  private readonly TaskRepository _repository;
 
   public TaskRepositoryTests()
   {
     var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-        .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}") 
-        .Options;
+      .UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}")
+      .Options;
 
     _context = new ApplicationDbContext(options);
     _mockLogger = new Mock<ILogger<TaskRepository>>();

@@ -3,10 +3,9 @@ using TaskManager.Desktop.Models;
 using TaskManager.Desktop.Data.Configurations;
 
 namespace TaskManager.Desktop.Data;
+
 public class ApplicationDbContext : DbContext
 {
-  public DbSet<TaskItem> Tasks { get; set; }
-
   // Основной конструктор для Dependency Injection
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : base(options)
@@ -18,14 +17,14 @@ public class ApplicationDbContext : DbContext
   {
   }
 
+  public DbSet<TaskItem> Tasks { get; set; }
+
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
     // Этот метод будет использоваться только если контекст не сконфигурирован через DI
     if (!optionsBuilder.IsConfigured)
-    {
       // Для миграций используем PostgreSQL
       optionsBuilder.UseNpgsql("Host=localhost;Database=taskmanager;Username=postgres;Password=1");
-    }
   }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)

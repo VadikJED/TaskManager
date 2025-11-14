@@ -12,21 +12,14 @@ namespace TaskManager.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-  private readonly ITaskRepository _taskRepository;
   private readonly ILogger<MainWindowViewModel> _logger;
+  private readonly ITaskRepository _taskRepository;
 
-  [ObservableProperty]
-  private string _newTaskTitle = string.Empty;
+  [ObservableProperty] private bool _isLoading;
 
-  [ObservableProperty]
-  private bool _isLoading;
+  [ObservableProperty] private string _newTaskTitle = string.Empty;
 
-  [ObservableProperty]
-  private string _statusMessage = "Ready";
-
-  public ObservableCollection<TaskItemViewModel> AllTasks { get; } = new();
-  public ObservableCollection<TaskItemViewModel> PendingTasks { get; } = new();
-  public ObservableCollection<TaskItemViewModel> CompletedTasks { get; } = new();
+  [ObservableProperty] private string _statusMessage = "Ready";
 
   public MainWindowViewModel(ITaskRepository taskRepository, ILogger<MainWindowViewModel> logger)
   {
@@ -36,6 +29,10 @@ public partial class MainWindowViewModel : ViewModelBase
     _logger.LogInformation("MainWindowViewModel initialized");
     _ = LoadTasksAsync();
   }
+
+  public ObservableCollection<TaskItemViewModel> AllTasks { get; } = new();
+  public ObservableCollection<TaskItemViewModel> PendingTasks { get; } = new();
+  public ObservableCollection<TaskItemViewModel> CompletedTasks { get; } = new();
 
   [RelayCommand]
   private async Task LoadTasksAsync()
@@ -131,12 +128,10 @@ public partial class MainWindowViewModel : ViewModelBase
       CompletedTasks.Clear();
 
       foreach (var item in AllTasks)
-      {
         if (item.IsCompleted)
           CompletedTasks.Add(item);
         else
           PendingTasks.Add(item);
-      }
 
       StatusMessage = "Task updated";
       _logger.LogDebug("Task updated successfully: {TaskId}", taskVM.Id);
@@ -182,7 +177,7 @@ public partial class MainWindowViewModel : ViewModelBase
   {
     var newStatus = !task.IsCompleted;
     _logger.LogInformation("Toggling task completion: {TaskId} from {OldStatus} to {NewStatus}",
-        task.Id, task.IsCompleted, newStatus);
+      task.Id, task.IsCompleted, newStatus);
 
     task.IsCompleted = newStatus;
     await UpdateTaskAsync(task);
@@ -201,6 +196,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await _taskRepository.DeleteAsync(task.Id);
         AllTasks.Remove(task);
       }
+
       CompletedTasks.Clear();
       StatusMessage = $"Cleared {completedTasks.Count} completed tasks";
 

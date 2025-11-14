@@ -9,8 +9,8 @@ namespace TaskManager.Tests.ViewModels;
 
 public class MainWindowViewModelTests
 {
-  private readonly Mock<ITaskRepository> _mockRepository;
   private readonly Mock<ILogger<MainWindowViewModel>> _mockLogger;
+  private readonly Mock<ITaskRepository> _mockRepository;
   private readonly MainWindowViewModel _viewModel;
 
   public MainWindowViewModelTests()
@@ -31,9 +31,9 @@ public class MainWindowViewModelTests
 
     // Assert
     _mockRepository.Verify(
-        repo => repo.AddAsync(It.IsAny<TaskItem>()),
-        Times.Never,
-        "Repository should not be called when title is empty"
+      repo => repo.AddAsync(It.IsAny<TaskItem>()),
+      Times.Never,
+      "Repository should not be called when title is empty"
     );
   }
 
@@ -48,9 +48,9 @@ public class MainWindowViewModelTests
 
     // Assert
     _mockRepository.Verify(
-        repo => repo.AddAsync(It.IsAny<TaskItem>()),
-        Times.Never,
-        "Repository should not be called when title is whitespace"
+      repo => repo.AddAsync(It.IsAny<TaskItem>()),
+      Times.Never,
+      "Repository should not be called when title is whitespace"
     );
   }
 
@@ -65,9 +65,9 @@ public class MainWindowViewModelTests
 
     // Assert
     _mockRepository.Verify(
-        repo => repo.AddAsync(It.IsAny<TaskItem>()),
-        Times.Never,
-        "Repository should not be called when title is null"
+      repo => repo.AddAsync(It.IsAny<TaskItem>()),
+      Times.Never,
+      "Repository should not be called when title is null"
     );
   }
 
@@ -87,25 +87,25 @@ public class MainWindowViewModelTests
     };
 
     _mockRepository
-        .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
-        .ReturnsAsync(createdTask);
+      .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
+      .ReturnsAsync(createdTask);
 
     // Act
     await _viewModel.AddTaskCommand.ExecuteAsync(null);
 
     // Assert
     _mockRepository.Verify(
-        repo => repo.AddAsync(It.IsAny<TaskItem>()),
-        Times.Once,
-        "Repository should be called exactly once when title is valid"
+      repo => repo.AddAsync(It.IsAny<TaskItem>()),
+      Times.Once,
+      "Repository should be called exactly once when title is valid"
     );
 
     _mockRepository.Verify(
-        repo => repo.AddAsync(It.Is<TaskItem>(task =>
-            task.Title == expectedTitle &&
-            !task.IsCompleted)),
-        Times.Once,
-        "Repository should receive task with correct title and completion status"
+      repo => repo.AddAsync(It.Is<TaskItem>(task =>
+        task.Title == expectedTitle &&
+        !task.IsCompleted)),
+      Times.Once,
+      "Repository should receive task with correct title and completion status"
     );
   }
 
@@ -125,8 +125,8 @@ public class MainWindowViewModelTests
     };
 
     _mockRepository
-        .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
-        .ReturnsAsync(createdTask);
+      .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
+      .ReturnsAsync(createdTask);
 
     // Act
     await _viewModel.AddTaskCommand.ExecuteAsync(null);
@@ -151,8 +151,8 @@ public class MainWindowViewModelTests
 
     var exceptionMessage = "Database connection failed";
     _mockRepository
-        .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
-        .ThrowsAsync(new Exception(exceptionMessage));
+      .Setup(repo => repo.AddAsync(It.IsAny<TaskItem>()))
+      .ThrowsAsync(new Exception(exceptionMessage));
 
     // Act
     await _viewModel.AddTaskCommand.ExecuteAsync(null);
@@ -162,5 +162,3 @@ public class MainWindowViewModelTests
     Assert.Empty(_viewModel.AllTasks);
   }
 }
-
-
