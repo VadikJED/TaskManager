@@ -1,7 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="TaskManager.App"
-             xmlns:local="using:TaskManager"
+             x:Class="TaskManager.Desktop.App"
+             xmlns:local="using:TaskManager.Desktop"
              RequestedThemeVariant="Light">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -12,4 +12,10 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+
+             <Application.Resources>
+                 <!-- Добавляем шрифт с поддержкой русского языка -->
+                 <FontFamily x:Key="DefaultFont">Microsoft Sans Serif, Arial, Segoe UI</FontFamily>
+             </Application.Resources>
 </Application>
