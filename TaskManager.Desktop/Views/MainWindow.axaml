@@ -1,0 +1,251 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TaskManager.Desktop.ViewModels"
+        xmlns:conv="using:TaskManager.Desktop.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:TaskManager.Desktop.ViewModels"
+        xmlns:converters="clr-namespace:TaskManager.Desktop.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        x:Class="TaskManager.Desktop.Views.MainWindow"
+        Title="Task Manager - Avalonia + EF Core"
+        MinWidth="700"
+        MinHeight="500"
+        Width="900"
+        Height="650"
+        x:DataType="vm:MainWindowViewModel">
+
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel />
+    </Design.DataContext>
+
+   
+    <Window.Resources>
+        <conv:BoolToTextDecorationsConverter x:Key="BoolToStrikeThrough" />
+        <conv:BoolToOpacityConverter x:Key="BoolToOpacity" />
+    </Window.Resources>
+
+   
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20" RowSpacing="15">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="15">
+            <TextBlock Text="🎯 Task Manager" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Button Content="🔄 Refresh" Command="{Binding LoadTasksCommand}" 
+                    IsEnabled="{Binding !IsLoading}" Padding="15,8"/>
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontStyle="Italic" 
+                       Foreground="Gray" Margin="20,0,0,0"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="20">
+            <!-- Left Column - Add Task & Pending -->
+            <StackPanel Grid.Column="0" Spacing="15">
+                <!-- Add Task Card -->
+                <Border Background="#f8f9fa" BorderBrush="#dee2e6" BorderThickness="1" 
+                        CornerRadius="8" Padding="20">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="➕ New Task" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBox x:Name="NewTaskTextBox"
+                                 Text="{Binding NewTaskTitle}" 
+                                 Watermark="Enter task title... (Press Enter to add)"
+                                 FontSize="14" Padding="12">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Command="{Binding AddTaskCommand}" 
+                                            Gesture="Enter"/>
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                        <Button Content="Add Task" Command="{Binding AddTaskCommand}" 
+                                IsEnabled="{Binding !IsLoading}"
+                                HorizontalAlignment="Stretch" Padding="15,10"
+                                Background="#007bff" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+
+          <!-- Pending Tasks Card -->
+<Border Background="#fff3cd" BorderBrush="#ffeaa7" BorderThickness="1" 
+        CornerRadius="8" Padding="20">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="⏳ Pending Tasks" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding PendingTasks.Count}" 
+                       Background="#fd7e14" Foreground="White"
+                       Padding="8,4" FontSize="12"/>
+        </StackPanel>
+        
+        <!-- ListBox для Pending Tasks -->
+        <ListBox ItemsSource="{Binding PendingTasks}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Margin="0,15,0,0"
+                 MaxHeight="200"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White" 
+                            BorderBrush="#dee2e6" BorderThickness="1"
+                            CornerRadius="6" Padding="15"
+                            Margin="0,0,0,8">
+                        <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+                            <TextBlock Grid.Column="0" Text="{Binding Title}" 
+                                       FontSize="14" VerticalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button Content="✅ Complete" 
+                                        Command="{Binding $parent[ListBox].DataContext.ToggleTaskCompletionCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="#28a745" Foreground="White"
+                                        Padding="10,6" FontSize="12"/>
+                                <Button Content="🗑️" 
+                                        Command="{Binding $parent[ListBox].DataContext.DeleteTaskCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="#dc3545" Foreground="White"
+                                        Padding="8" FontSize="12"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</Border>
+            </StackPanel>
+
+            <!-- Right Column - Completed Tasks -->
+            <StackPanel Grid.Column="1" Spacing="15">
+              <!-- Completed Tasks -->
+<Border Background="#d1edff" BorderBrush="#b3d9ff" BorderThickness="1" 
+        CornerRadius="8" Padding="20">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="✅ Completed Tasks" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding CompletedTasks.Count}" 
+                       Background="#17a2b8" Foreground="White"
+                       Padding="8,4" FontSize="12"/>
+            <Button Content="🗑️ Clear All" Command="{Binding ClearCompletedTasksCommand}"
+                    IsEnabled="{Binding !IsLoading}" Margin="20,0,0,0"
+                    Background="#6c757d" Foreground="White" Padding="10,6"/>
+        </StackPanel>
+        
+        <!-- ListBox для Completed Tasks -->
+        <ListBox ItemsSource="{Binding CompletedTasks}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Margin="0,15,0,0"
+                 MaxHeight="200"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White" 
+                            BorderBrush="#dee2e6" BorderThickness="1"
+                            CornerRadius="6" Padding="15"
+                            Margin="0,0,0,8">
+                        <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+                            <TextBlock Grid.Column="0" Text="{Binding Title}" 
+                                       FontSize="14" VerticalAlignment="Center"
+                                       TextDecorations="{Binding IsCompleted, Converter={x:Static conv:BoolToTextDecorationsConverter.Instance}}"
+                                       Opacity="{Binding IsCompleted, Converter={x:Static conv:BoolToOpacityConverter.Instance}}"
+                                       TextWrapping="Wrap"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button Content="↩️ Reopen" 
+                                        Command="{Binding $parent[ListBox].DataContext.ToggleTaskCompletionCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="#ffc107" Foreground="Black"
+                                        Padding="10,6" FontSize="12"/>
+                                <Button Content="🗑️" 
+                                        Command="{Binding $parent[ListBox].DataContext.DeleteTaskCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="#dc3545" Foreground="White"
+                                        Padding="8" FontSize="12"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</Border>
+
+              <!-- All Tasks -->
+<Border Background="#e2e3e5" BorderBrush="#d6d8db" BorderThickness="1" 
+        CornerRadius="8" Padding="20">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="📋 All Tasks" FontSize="16" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding AllTasks.Count, StringFormat='({0} tasks)'}" 
+                       FontSize="14" Foreground="#6c757d" VerticalAlignment="Center"/>
+        </StackPanel>
+        
+        <!-- ListBox для All Tasks -->
+        <ListBox ItemsSource="{Binding AllTasks}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Margin="0,15,0,0"
+                 MaxHeight="300"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White" 
+                            BorderBrush="#dee2e6" BorderThickness="1"
+                            CornerRadius="6" Padding="15"
+                            Margin="0,0,0,8">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" VerticalAlignment="Center">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" 
+                                      Command="{Binding $parent[ListBox].DataContext.ToggleTaskCompletionCommand}"
+                                      CommandParameter="{Binding}"
+                                      Margin="0,0,10,0"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Title}" 
+                                       FontSize="14" VerticalAlignment="Center"
+                                       TextDecorations="{Binding IsCompleted, Converter={x:Static conv:BoolToTextDecorationsConverter.Instance}}"
+                                       Opacity="{Binding IsCompleted, Converter={x:Static conv:BoolToOpacityConverter.Instance}}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Grid.Column="2" Text="{Binding CreatedAt, StringFormat='{}{0:MM/dd HH:mm}'}" 
+                                       FontSize="10" Foreground="Gray" 
+                                       Margin="10,0,0,0"
+                                       VerticalAlignment="Center"/>
+                            <Button Grid.Column="3" Content="🗑️" 
+                                    Command="{Binding $parent[ListBox].DataContext.DeleteTaskCommand}"
+                                    CommandParameter="{Binding}"
+                                    Background="Transparent" 
+                                    BorderThickness="1"
+                                    BorderBrush="#dc3545"
+                                    Foreground="#dc3545"
+                                    Padding="8"
+                                    Margin="10,0,0,0"
+                                    Width="30" Height="30"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#343a40" CornerRadius="6" Padding="15">
+            <StackPanel Orientation="Horizontal" Spacing="20">
+                <TextBlock Text="💡 Tip: Press Enter to quickly add tasks" 
+                           Foreground="White" FontSize="12"/>
+                <TextBlock Text="{Binding AllTasks.Count, StringFormat='Total: {0} tasks'}" 
+                           Foreground="#adb5bd" FontSize="12"/>
+                <TextBlock Text="{Binding PendingTasks.Count, StringFormat='Pending: {0}'}" 
+                           Foreground="#ffc107" FontSize="12"/>
+                <TextBlock Text="{Binding CompletedTasks.Count, StringFormat='Completed: {0}'}" 
+                           Foreground="#28a745" FontSize="12"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Loading Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#80000000" 
+                IsVisible="{Binding IsLoading}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="15">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="10"/>
+                <TextBlock Text="Loading..." Foreground="White" FontSize="16" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
